@@ -68,13 +68,6 @@
     color: rgb(27, 98, 184);
 }
 
-/* Tablet - 768px and up */
-@media (min-width: 768px) {
-    .ot-mobile-icons {
-        display: none; /* Hide all mobile icons on tablet and desktop */
-    }
-}
-
 
 
 .ot-nav-item {
@@ -114,6 +107,7 @@
     width: 100%;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 10px;
 }
 
 /* Search Bar */
@@ -156,10 +150,17 @@
     color: rgb(15, 78, 160);
 }
 
+
+
+
 /* Tablet - 768px and up */
 @media (min-width: 768px) {
     .ot-header-content {
         flex-wrap: nowrap; /* Prevent wrapping on tablet and desktop */
+    }
+
+    .ot-mobile-icons {
+        display: none; /* Hide all mobile icons on tablet and desktop */
     }
 
     .ot-hamburger {
