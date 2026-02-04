@@ -46,7 +46,7 @@ export default function Header({ nameApp }) {
                     setSearch("");
                 } else {
 
-                    alert("Non abiamo trovato nessun prodotto con questo nome");
+                    alert("Non abbiamo trovato nessun prodotto con questo nome");
                 }
             })
             .catch((err) => {
