@@ -1,6 +1,7 @@
 import "bootstrap/dist/css/bootstrap.css"
 import "./footer.css"
 import logo from "../assets/images/logo.jpg";
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 
 export default function Footer() {
@@ -23,12 +24,14 @@ export default function Footer() {
                         <li>Corsi Fitness</li>
                     </ul>
                 </div>
-                <div className="">
+                <div className="ay-sociaol-footer">
                     <ul>
                         <h2>I nostri Social</h2>
-                        <li>Facebook: <a id="link" href="https://drawsql.app/teams/david-zarfati/diagrams/books" target="_blank" rel="noopener noreferrer">FuelUp</a></li>
-                        <li>Instagram: <a id="link" href="http://" target="_blank" rel="noopener noreferrer">FuelUp_Official</a></li>
-                        <li>pinterest: <a id="link" href="http://" target="_blank" rel="noopener noreferrer">FuelUp_Pinterest</a></li>
+                        <li><i class="bi bi-facebook"></i><a id="link" href="https://drawsql.app/teams/david-zarfati/diagrams/books" target="_blank" rel="noopener noreferrer">FuelUp</a></li>
+                        <li><i class="bi bi-instagram"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">FuelUp_Official</a></li>
+                        <li><i class="bi bi-pinterest"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">FuelUp_Pinterest</a></li>
+                        <li><i class="bi bi-twitter-x"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">FuelUp_X</a></li>
+                        <li><i class="bi bi-tiktok"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">FuelUp_TikTok</a></li>
                     </ul>
                 </div>
             </div>
