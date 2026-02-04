@@ -1,40 +1,55 @@
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import "./HomePage.css";
 
 
 export default function HomePage() {
-    const arrayTestCard = [{
-        title: "casein vanilla serving",
-        image: "../assets/testimages/image/casein-vanilla-serving.jpg",
-        description: "una porzione di proteine casearie alla vanilla",
-        categories: "protein,integration,natural"
-    }, {
-        title: "beta alanine scoop",
-        image: "../assets/testimages/image/beta-alanine-scoop.jpg",
-        description: "uno scoop di beta alanina",
-        categories: "protein,integration,science"
-    }, {
-        title: "beta alanine scoop",
-        image: "../assets/testimages/image/casein-vanilla-serving.jpg",
-        description: "uno scoop di beta alanina",
-        categories: "protein,integration,science"
-    }, {
-        title: "beta alanine scoop",
-        image: "../assets/testimages/image/beta-alanine-scoop.jpg",
-        description: "uno scoop di beta alanina",
-        categories: "protein,integration,science"
-    }, {
-        title: "beta alanine scoop",
-        image: "../assets/testimages/image/casein-vanilla-serving.jpg",
-        description: "uno scoop di beta alanina",
-        categories: "protein,integration,science"
-    }, {
-        title: "beta alanine scoop",
-        image: "../assets/testimages/image/beta-alanine-scoop.jpg",
-        description: "uno scoop di beta alanina",
-        categories: "protein,integration,science"
-    }];
+    const arrayTestCard = [
+        {
+            title: "casein vanilla serving",
+            slug: "casein-vanilla-serving",
+            image: "../assets/testimages/image/casein-vanilla-serving.jpg",
+            description: "una porzione di proteine casearie alla vanilla",
+            categories: "protein,integration,natural"
+        },
+        {
+            title: "beta alanine scoop",
+            slug: "beta-alanine-scoop",
+            image: "../assets/testimages/image/beta-alanine-scoop.jpg",
+            description: "uno scoop di beta alanina",
+            categories: "protein,integration,science"
+        },
+        {
+            title: "beta alanine scoop",
+            slug: "beta-alanine-scoop-2",
+            image: "../assets/testimages/image/casein-vanilla-serving.jpg",
+            description: "uno scoop di beta alanina",
+            categories: "protein,integration,science"
+        },
+        {
+            title: "beta alanine scoop",
+            slug: "beta-alanine-scoop-3",
+            image: "../assets/testimages/image/beta-alanine-scoop.jpg",
+            description: "uno scoop di beta alanina",
+            categories: "protein,integration,science"
+        },
+        {
+            title: "beta alanine scoop",
+            slug: "beta-alanine-scoop-4",
+            image: "../assets/testimages/image/casein-vanilla-serving.jpg",
+            description: "uno scoop di beta alanina",
+            categories: "protein,integration,science"
+        },
+        {
+            title: "beta alanine scoop",
+            slug: "beta-alanine-scoop-5",
+            image: "../assets/testimages/image/beta-alanine-scoop.jpg",
+            description: "uno scoop di beta alanina",
+            categories: "protein,integration,science"
+        }
+    ];
+
 
     return (
         <>
@@ -56,6 +71,9 @@ export default function HomePage() {
                                                 <h5 className="card-title">{card.title}</h5>
                                                 <p className="card-text">{card.description}</p>
                                                 <p className="card-text">{card.categories}</p>
+                                                <Link to={`/products/${card.slug}`} className="btn btn-outline-primary">
+                                                    Vedi dettagli
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
