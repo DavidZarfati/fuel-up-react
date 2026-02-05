@@ -6,7 +6,9 @@ export default function DefaultLayout({ nameApp }) {
   return (
     <>
       <Header nameApp={nameApp} />
-      <Outlet />
+      <main style={{ flex: 1 }}>
+        <Outlet />
+      </main>
       <Footer />
     </>
   );
