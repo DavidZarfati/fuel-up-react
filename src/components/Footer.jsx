@@ -27,11 +27,11 @@ export default function Footer() {
                 <div className="ay-sociaol-footer">
                     <ul>
                         <h2>I nostri Social</h2>
-                        <li><i class="bi bi-facebook"></i><a id="link" href="https://drawsql.app/teams/david-zarfati/diagrams/books" target="_blank" rel="noopener noreferrer">fuelUp_facebook</a></li>
-                        <li><i class="bi bi-instagram"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_official</a></li>
-                        <li><i class="bi bi-pinterest"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_pinterest</a></li>
-                        <li><i class="bi bi-twitter-x"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_x</a></li>
-                        <li><i class="bi bi-tiktok"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_tikTok</a></li>
+                        <li><i className="bi bi-facebook"></i><a id="link" href="https://drawsql.app/teams/david-zarfati/diagrams/books" target="_blank" rel="noopener noreferrer">fuelUp_facebook</a></li>
+                        <li><i className="bi bi-instagram"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_official</a></li>
+                        <li><i className="bi bi-pinterest"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_pinterest</a></li>
+                        <li><i className="bi bi-twitter-x"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_x</a></li>
+                        <li><i className="bi bi-tiktok"></i><a id="link" href="http://" target="_blank" rel="noopener noreferrer">fuelUp_tikTok</a></li>
                     </ul>
                 </div>
             </div>
