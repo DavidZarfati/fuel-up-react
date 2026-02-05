@@ -28,15 +28,22 @@ export default function Productpagedetail() {
 
     return (
         <>
-            {/* <h1>{slug}</h1> */}
-            <div className="d-flex flex-column">
-                <img
-                    src={`${backendBaseUrl}${product.result[0].image}`}
-                    alt={slug}
-                    style={{ maxWidth: '20%', height: '30%', display: 'block', margin: '40px auto' }}
-                />
-                <h2 className="dz-titolo-prodotto">{slug.replaceAll ? slug.replaceAll('-', ' ') : slug.split('-').join(' ')}</h2>
-            </div>
+            {loading ? (
+                <div>Loading...</div>
+            ) : error ? (
+                <div>{error}</div>
+            ) : product && product.result && product.result[0] ? (
+                <div className="d-flex flex-column">
+                    <img
+                        src={`${backendBaseUrl}${product.result[0].image}`}
+                        alt={slug}
+                        style={{ maxWidth: '20%', height: '30%', display: 'block', margin: '40px auto' }}
+                    />
+                    <h2 className="dz-titolo-prodotto">{slug.replaceAll ? slug.replaceAll('-', ' ') : slug.split('-').join(' ')}</h2>
+                </div>
+            ) : (
+                <div>Product data not available.</div>
+            )}
         </>
     );
 }
