@@ -57,6 +57,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import "./ProductPageDetail.css"
 
 export default function Productpagedetail() {
     const { slug } = useParams();
@@ -84,10 +85,8 @@ export default function Productpagedetail() {
     if (!product) return <h2>Prodotto non trovato</h2>;
 
     return (
-        <section>
-            <h1>{product.title}</h1>
-            <p>{product.description}</p>
-            {/* Add more product details as needed */}
-        </section>
+        <>
+            <h1 className="h-100">CIao</h1>
+        </>
     );
 }
