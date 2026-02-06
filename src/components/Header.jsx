@@ -17,7 +17,7 @@ export default function Header({ nameApp }) {
         { title: "Chi siamo", path: "/" },
         { title: "Nostri prodotti", path: "/products" },
         { title: "Prodotti preferiti", path: "/products/favourites" },
-        { title: "Carello", path: "/shopping-cart" },
+        { title: "Carrello", path: "/shopping-cart" },
 
     ];
 
