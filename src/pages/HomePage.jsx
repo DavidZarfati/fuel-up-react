@@ -20,7 +20,7 @@ export default function HomePage() {
         setLoading(true);
         axios.get(`${backendBaseUrl}/api/products?limit=30`)
             .then((resp) => {
-                // Se la risposta è un oggetto con chiave result (array), usa quella
+        
                 let arr = [];
                 if (Array.isArray(resp.data)) {
                     arr = resp.data;
@@ -44,13 +44,13 @@ export default function HomePage() {
   <section className="ot-home-container ot-bg-teal py-4">
     <div className="container">
 
-      {/* HERO (se vuoi lasciare il tuo div) */}
+
       <div className="ot-hero-section mb-4 rounded-4"></div>
 
-      {/* TOOLBAR */}
+
       <div className="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3 mb-4">
 
-        {/* CATEGORIE */}
+
         <div className="d-flex flex-wrap gap-2">
           <button
             className={`btn btn-sm ${categoria === "" ? "btn-dark" : "btn-outline-dark"}`}
@@ -88,7 +88,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* TOGGLE LISTA/GRIGLIA */}
+
         <div className="btn-group" role="group" aria-label="Vista prodotti">
           <button
             type="button"
@@ -131,7 +131,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* STATO */}
+
       {loading && (
         <div className="text-center py-5">
           <div className="spinner-border" role="status" />
@@ -145,7 +145,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* CONTENUTO */}
+  
       {!loading && !error && Array.isArray(products) && (
         !isGridMode ? (
           // ✅ GRIGLIA
@@ -158,7 +158,7 @@ export default function HomePage() {
               ))}
           </div>
         ) : (
-          // ✅ LISTA
+          
           <div className="d-flex flex-column gap-3">
             {products
               .filter(card => categoria === "" || card.macro_categories_id === categoria)
@@ -173,7 +173,7 @@ export default function HomePage() {
         )
       )}
 
-      {/* EMPTY STATE */}
+      
       {!loading && !error && Array.isArray(products) && products.length === 0 && (
         <div className="alert alert-warning" role="alert">
           Nessun prodotto disponibile.
