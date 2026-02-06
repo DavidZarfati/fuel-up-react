@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useGlobal } from "../context/GlobalContext";
 import SingleProductCard from "../components/SingleProductCard";
-import SingleProductList from "../components/SigleProductList";
+import SingleProductList from "../components/SingleProductList";
 
 
 export default function ProductsPage() {
