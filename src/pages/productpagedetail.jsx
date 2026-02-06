@@ -1,71 +1,106 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./ProductPageDetail.css"
+import "./ProductPageDetail.css";
+
+// ✅ aggiungi questo import
+import { useCart } from "../context/CartContext";
 
 export default function Productpagedetail() {
-    const { slug } = useParams();
-    const [product, setProduct] = useState(null);
-    const backendBaseUrl = import.meta.env.VITE_BACKEND_URL;
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const { slug } = useParams();
+  const [product, setProduct] = useState(null);
+  const backendBaseUrl = import.meta.env.VITE_BACKEND_URL;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        setLoading(true);
-        axios
-            .get(`${backendBaseUrl}/api/products/${slug}`)
-            .then((resp) => {
-                setProduct(resp.data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError("Prodotto non trovato");
-                setLoading(false);
-            });
-    }, [slug]);
+  // ✅ prendi addToCart dal context
+  const { addToCart } = useCart();
 
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`${backendBaseUrl}/api/products/${slug}`)
+      .then((resp) => {
+        setProduct(resp.data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Prodotto non trovato");
+        setLoading(false);
+      });
+  }, [slug, backendBaseUrl]);
 
+  // ✅ comodo: estrai il prodotto vero e proprio
+  const p = product?.result?.[0];
 
-    return (
-        <>
-            {loading ? (
-                <div>Loading...</div>
-            ) : error ? (
-                <div>{error}</div>
-            ) : product && product.result && product.result[0] ? (
-                <div className="d-flex flex-column">
-                    <img
-                        src={`${backendBaseUrl}${product.result[0].image}`}
-                        alt={slug}
-                        style={{ maxWidth: '20%', height: '30%', display: 'block', margin: '40px auto' }}
-                    />
-                    <h2 className="dz-titolo-prodotto">{slug.replaceAll ? slug.replaceAll('-', ' ') : slug.split('-').join(' ')} <span className="dz-brand-badge">{product.result[0].brand}</span></h2>
-                    <p className="dz-description-prodotto">
-                        {product.result[0].description ? product.result[0].description : "Nessuna descrizione disponibile."}
-                    </p>
-                    <p className="dz-description-prodotto">
-                        {product.result[0].size ? `Dimensione : ${product.result[0].size}` : "Nessuna descrizione disponibile."}
-                    </p>
-                    <p className="dz-description-prodotto">
-                        {product.result[0].manufacturer_note ? `Informazioni Aggiuntive : ${product.result[0].manufacturer_note}` : "Nessuna descrizione disponibile."}
-                    </p>
-                    <p className="dz-description-prodotto">
-                        {product.result[0].color ? `colore : ${product.result[0].color}` : `gusto : ${product.result[0].flavor}`}
-                    </p>
-                    <div className="d-flex justify-content-around">
+  // ✅ funzione che costruisce l’oggetto da mettere nel carrello
+  function handleAddToCart() {
+    if (!p) return;
 
-                        <p className="dz-description-prodotto">
-                            Prezzo Base : <span className="dz-prodotto-senza-sconto">{product.result[0].price}</span>
-                        </p>
-                        <p className="dz-description-prodotto">
-                            Prezzo Scontato : <span className="dz-prezzo-scontato">{product.result[0].discount_price}</span>
-                        </p>
-                    </div>
+    addToCart({
+      id: p.id, // IMPORTANTISSIMO: deve esserci
+      name: slug.replaceAll ? slug.replaceAll("-", " ") : slug.split("-").join(" "),
+      brand: p.brand,
+      image: p.image,
+      // scelgo il prezzo scontato se c’è, altrimenti quello base
+      price: Number(p.discount_price ?? p.price ?? 0),
+    });
+  }
 
-                </div>
-            ) : (
-                <div>Product data not available.</div>
-            )}
-        </>
-    );
+  return (
+    <>
+      {loading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div>{error}</div>
+      ) : p ? (
+        <div className="d-flex flex-column">
+          <img
+            src={`${backendBaseUrl}${p.image}`}
+            alt={slug}
+            style={{ maxWidth: "20%", height: "30%", display: "block", margin: "40px auto" }}
+          />
+
+          <h2 className="dz-titolo-prodotto">
+            {slug.replaceAll ? slug.replaceAll("-", " ") : slug.split("-").join(" ")}{" "}
+            <span className="dz-brand-badge">{p.brand}</span>
+          </h2>
+
+          <p className="dz-description-prodotto">
+            {p.description ? p.description : "Nessuna descrizione disponibile."}
+          </p>
+
+          <p className="dz-description-prodotto">
+            {p.size ? `Dimensione : ${p.size}` : "Nessuna descrizione disponibile."}
+          </p>
+
+          <p className="dz-description-prodotto">
+            {p.manufacturer_note ? `Informazioni Aggiuntive : ${p.manufacturer_note}` : "Nessuna descrizione disponibile."}
+          </p>
+
+          <p className="dz-description-prodotto">
+            {p.color ? `colore : ${p.color}` : `gusto : ${p.flavor}`}
+          </p>
+
+          <div className="d-flex justify-content-around">
+            <p className="dz-description-prodotto">
+              Prezzo Base : <span className="dz-prodotto-senza-sconto">{p.price}</span>
+            </p>
+            <p className="dz-description-prodotto">
+              Prezzo Scontato : <span className="dz-prezzo-scontato">{p.discount_price}</span>
+            </p>
+          </div>
+
+          {/* bottone aggiungi al carrello */}
+          <div className="d-flex justify-content-center" style={{ marginTop: 20 }}>
+            <button className="btn btn-primary" onClick={handleAddToCart}>
+              Aggiungi al carrello
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div>Product data not available.</div>
+      )}
+    </>
+  );
 }

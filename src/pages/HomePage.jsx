@@ -9,6 +9,7 @@ export default function HomePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const backendBaseUrl = import.meta.env.VITE_BACKEND_URL;
+    
 
     useEffect(() => {
         setLoading(true);
