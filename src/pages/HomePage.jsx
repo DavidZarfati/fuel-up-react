@@ -76,19 +76,19 @@ export default function HomePage() {
                     </div>
                 ) : (<div>
                     {!loading && !error && Array.isArray(products) && products.map((card, idx) => (
-                        <div className="col-sm-12 col-md-6 col-lg-4" key={idx}>
-                            <div className="card mb-3" style={{ border: '1px solid #ccc', background: '#f9f9f9', minHeight: 250 }}>
+                        <div className="col-12" key={idx}>
+                            <div className="card mb-3" style={{ border: '1px solid #ccc', background: '#f9f9f9', minHeight: 100 }}>
                                 <div className="row no-gutters align-items-center">
                                     <div className="col-12">
-                                        <div className="card-body">
+                                        <div className="card-body d-flex">
                                             <img
                                                 src={`${backendBaseUrl}${card.image}`}
                                                 alt={card.name}
-                                                style={{ maxWidth: '50px', maxHeight: '50px', objectFit: 'contain', marginBottom: '10px' }}
+                                                style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', marginBottom: '10px' }}
                                             />
-                                            <h5 className="card-title">{card.name}</h5>
+                                            <h5 className="card-title">{card.name}- </h5>
                                             <p className="card-text">{card.description}</p>
-                                            <Link to={`/products/${card.slug}`} className="btn btn-outline-primary">
+                                            <Link to={`/products/${card.slug}`} className="btn btn-outline-primary dz-bottone-dettagli">
                                                 Vedi dettagli
                                             </Link>
                                         </div>
