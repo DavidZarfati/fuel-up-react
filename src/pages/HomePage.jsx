@@ -33,7 +33,7 @@ export default function HomePage() {
                 setError("Errore nel caricamento dei prodotti");
                 setLoading(false);
             });
-    }, []);
+    }, [categoria]);
 
     return (
         <>
@@ -53,7 +53,28 @@ export default function HomePage() {
                         <button onClick={() => setcategoria(4)}>Food & Snacks</button>
                     </div>
                     <div>
-                        <button onClick={() => setisGridMode(1)}>Lista</button>
+                        <button onClick={async () => {
+                            setisGridMode(1);
+                            if (categoria !== "") {
+                                setLoading(true);
+                                try {
+                                    const resp = await axios.get(`${backendBaseUrl}/api/products?macrocategoria_id=${categoria}`);
+                                    let arr = [];
+                                    if (Array.isArray(resp.data)) {
+                                        arr = resp.data;
+                                    } else if (Array.isArray(resp.data.result)) {
+                                        arr = resp.data.result;
+                                    } else if (Array.isArray(resp.data.products)) {
+                                        arr = resp.data.products;
+                                    }
+                                    setProducts(arr);
+                                } catch (err) {
+                                    setError("Errore nel caricamento dei prodotti");
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }
+                        }}>Lista</button>
                         <button onClick={() => setisGridMode("")}>Griglia</button>
                     </div>
                 </div>
@@ -112,28 +133,30 @@ export default function HomePage() {
                         </div>
                     </div>
                 ) : (<div>
-                    {!loading && !error && Array.isArray(products) && products.map((card, idx) => (
-                        <div className="col-12" key={idx}>
-                            <div className="card mb-3" style={{ border: '1px solid #ccc', background: '#f9f9f9', minHeight: 100 }}>
-                                <div className="row no-gutters align-items-center">
-                                    <div className="col-12">
-                                        <div className="card-body d-flex">
-                                            <img
-                                                src={`${backendBaseUrl}${card.image}`}
-                                                alt={card.name}
-                                                style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', marginBottom: '10px' }}
-                                            />
-                                            <h5 className="card-title">{card.name}- </h5>
-                                            <p className="card-text">{card.description}</p>
-                                            <Link to={`/products/${card.slug}`} className="btn btn-outline-primary dz-bottone-dettagli">
-                                                Vedi dettagli
-                                            </Link>
+                    {!loading && !error && Array.isArray(products) && products
+                        .filter(card => categoria === "" || card.macro_categories_id === categoria)
+                        .map((card, idx) => (
+                            <div className="col-12" key={idx}>
+                                <div className="card mb-3" style={{ border: '1px solid #ccc', background: '#f9f9f9', minHeight: 100 }}>
+                                    <div className="row no-gutters align-items-center">
+                                        <div className="col-12">
+                                            <div className="card-body d-flex">
+                                                <img
+                                                    src={`${backendBaseUrl}${card.image}`}
+                                                    alt={card.name}
+                                                    style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', marginBottom: '10px' }}
+                                                />
+                                                <h5 className="card-title">{card.name}- </h5>
+                                                <p className="card-text">{card.description}</p>
+                                                <Link to={`/products/${card.slug}`} className="btn btn-outline-primary dz-bottone-dettagli">
+                                                    Vedi dettagli
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
 
 
                 </div>)}
