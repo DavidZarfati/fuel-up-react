@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 export default function SingleProductCard({ product }) {
   const backendBaseUrl = import.meta.env.VITE_BACKEND_URL;
+  const { addToCart } = useCart();
+
+    function handleAddToCart() {
+    addToCart(product);
+  }
 
   return (
     <div className="card h-100 shadow-sm container pb-2">
@@ -44,10 +50,10 @@ export default function SingleProductCard({ product }) {
             Dettagli
           </Link>
 
-          {/* esempio futuro carrello */}
-          {/* <button className="btn btn-primary btn-sm">
+
+          <button onClick={handleAddToCart} className="btn btn-primary btn-sm">
             Aggiungi
-          </button> */}
+          </button>
         </div>
       </div>
     </div>
