@@ -11,16 +11,17 @@ export default function CartPage() {
     clearCart,
     totalItems,
     totalPrice,
+    totalWeight,
+    expeditionCost
   } = useCart();
   //console.log(cart);
   //console.log(cart[0].weight_kg);
   //console.log(cart[0].quantity);
-  let totalWeight = 0;
-  for(let i in cart)
-  {
-    totalWeight = cart[i].weight_kg * cart[i].quantity; 
-  }
-  totalWeight = totalWeight.toFixed(2);
+  // let totalWeight = 0;
+  // for(let i in cart)
+  // {
+  //   totalWeight = cart[i].weight_kg * cart[i].quantity; 
+  // }
   //console.log(totalWeight);
   const backendBaseUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -110,7 +111,7 @@ export default function CartPage() {
                 </h5>
 
                 <h5>
-                  Costi di spedizione: &euro;{totalPrice >= 100.00 ? 0 : (3 + 0.15 * totalWeight).toFixed(2)}
+                  Costi di spedizione: &euro;{expeditionCost.toFixed(2)}
                 </h5>
 
                 <div className="d-grid d-sm-flex gap-2">
