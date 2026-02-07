@@ -155,23 +155,83 @@ export default function HomePage() {
                 <div className="col-12 col-md-6 col-lg-4" key={card.id ?? card._id ?? idx}>
                   <SingleProductCard product={card} />
                 </div>
-              ))}
-          </div>
-        ) : (
-          
-          <div className="d-flex flex-column gap-3">
-            {products
-              .filter(card => categoria === "" || card.macro_categories_id === categoria)
-              .map((card, idx) => (
-                <div key={card.id ?? card._id ?? idx} className="card shadow-sm border-0 rounded-4">
-                  <div className="card-body">
-                    <SingleProductList product={card} />
-                  </div>
-                </div>
-              ))}
-          </div>
-        )
-      )}
+                {!isGridMode ? (
+                    <div className="d-flex container ot-bg-teal">
+                        <div className="row">
+                            {loading && <p>Caricamento prodotti...</p>}
+                            {error && <p>{error}</p>}
+                            {!loading && !error && Array.isArray(products) && (
+                                categoria === ""
+                                    ? products.slice(0, 12).map((card, idx) => (
+                                        <div className="col-sm-12 col-md-6 col-lg-4 d-flex" key={idx}>
+                                            <div className="card mb-3" style={{ border: '1px solid #ccc', background: '#f9f9f9', minHeight: 250 }}>
+                                                <div className="row no-gutters align-items-center">
+                                                    <div className="col-12">
+                                                        <div className="card-body">
+                                                            <img
+                                                                src={`${backendBaseUrl}${card.image}`}
+                                                                alt={card.name}
+                                                                style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain', marginBottom: '10px' }}
+                                                            />
+                                                            <h5 className="card-title">{card.name}</h5>
+                                                            <p className="card-text">{card.description}</p>
+                                                            <Link to={`/products/${card.slug}`} className="btn btn-outline-primary">
+                                                                Vedi dettagli
+                                                            </Link>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                    : products.filter(card => card.macro_categories_id === categoria).map((card, idx) => (
+                                        <div className="col-sm-12 col-md-6 col-lg-4" key={idx}>
+                                            <div className="card mb-3" style={{ border: '1px solid #ccc', background: '#f9f9f9', minHeight: 250 }}>
+                                                <div className="row no-gutters align-items-center">
+                                                    <div className="col-12">
+                                                        <div className="card-body">
+                                                            <img
+                                                                src={`${backendBaseUrl}${card.image}`}
+                                                                alt={card.name}
+                                                                style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain', marginBottom: '10px' }}
+                                                            />
+                                                            <h5 className="card-title">{card.name}</h5>
+                                                            <p className="card-text">{card.description}</p>
+                                                            <Link to={`/products/${card.slug}`} className="btn btn-outline-primary">
+                                                                Vedi dettagli
+                                                            </Link>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                            )}
+                        </div>
+                    </div>
+                ) : (<div>
+                    {!loading && !error && Array.isArray(products) && products.map((card, idx) => (
+                        <div className="col-12" key={idx}>
+                            <div className="card mb-3" style={{ border: '1px solid #ccc', background: '#f9f9f9', minHeight: 100 }}>
+                                <div className="row no-gutters align-items-center">
+                                    <div className="col-12">
+                                        <div className="card-body d-flex">
+                                            <img
+                                                src={`${backendBaseUrl}${card.image}`}
+                                                alt={card.name}
+                                                style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', marginBottom: '10px' }}
+                                            />
+                                            <h5 className="card-title">{card.name}- </h5>
+                                            <p className="card-text">{card.description}</p>
+                                            <Link to={`/products/${card.slug}`} className="btn btn-outline-primary dz-bottone-dettagli">
+                                                Vedi dettagli
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
 
       
       {!loading && !error && Array.isArray(products) && products.length === 0 && (
