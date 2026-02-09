@@ -19,7 +19,7 @@ export default function HomePage() {
     const [showToast, setShowToast] = useState(false);
     useEffect(() => {
         if (toast && showToast) {
-            const timer = setTimeout(() => setShowToast(false), 2000);
+            const timer = setTimeout(() => setShowToast(false), 4000);
             return () => clearTimeout(timer);
         }
     }, [toast, showToast]);
@@ -164,7 +164,7 @@ export default function HomePage() {
                                                                     }}
                                                                     className="btn btn-primary btn-sm"
                                                                 >
-                                                                    Aggiungi
+                                                                    Aggiungi <i class="bi bi-cart-plus"></i>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -216,7 +216,7 @@ export default function HomePage() {
                                                                     }}
                                                                     className="btn btn-primary btn-sm"
                                                                 >
-                                                                    Aggiungi
+                                                                    <i class="bi bi-cart-plus"></i>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -296,7 +296,7 @@ export default function HomePage() {
                                                             }}
                                                             className="btn btn-primary btn-sm"
                                                         >
-                                                            Aggiungi
+                                                            Aggiungi <i class="bi bi-cart-plus"></i>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -336,7 +336,7 @@ export default function HomePage() {
                                                             Vedi dettagli
                                                         </Link>
                                                         <button onClick={() => addToCart(card)} className="btn btn-primary btn-sm">
-                                                            Aggiungi
+                                                            Aggiungi <i class="bi bi-cart-plus"></i>
                                                         </button>
                                                     </div>
                                                 </div>
