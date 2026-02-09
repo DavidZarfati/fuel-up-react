@@ -55,7 +55,7 @@ export function CartProvider({ children }) {
       return [...prevCart, { ...product, quantity: 1 }];
     });
 
-    alert(`${product.name} aggiunto al carrello 🛒`);
+    // alert(`${product.name} aggiunto al carrello 🛒`);
   }
 
   // 👉 aumenta qty di un prodotto (se vuoi un tasto +)
