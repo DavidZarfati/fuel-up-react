@@ -185,11 +185,12 @@
   color: #666;
   font-size: 14px;
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 
 .ot-list-item-price {
   margin: 0;
