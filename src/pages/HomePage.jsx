@@ -238,6 +238,11 @@ export default function HomePage() {
                                         </div>
                                         <div className="toast-body" style={{ padding: '12px 24px', fontSize: 18 }}>
                                             Hai aggiunto <b>{toast.name}</b> al carrello
+                                            <div style={{ marginTop: 12 }}>
+                                                <Link to="/shopping-cart" className="btn btn-success btn-sm" style={{ fontWeight: 'bold', fontSize: 16 }} onClick={() => setShowToast(false)}>
+                                                    Vedi nel carrello
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
