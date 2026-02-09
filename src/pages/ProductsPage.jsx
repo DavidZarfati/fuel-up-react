@@ -13,7 +13,7 @@ export default function ProductsPage() {
 
   const limit = 12;
 
-  // ✅ Leggi filtri dall'URL (query string)
+
   const urlState = useMemo(() => {
     const pageFromUrl = parseInt(searchParams.get("page") || "1", 10);
     const safePage = Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1;
@@ -21,7 +21,7 @@ export default function ProductsPage() {
     const view = searchParams.get("view") || "grid"; // "grid" | "list"
     const safeView = view === "list" ? "list" : "grid";
 
-    // opzionali (se li userai dopo)
+  
     const q = searchParams.get("q") || "";
     const orderBy = searchParams.get("order_by") || "created_at";
     const orderDir = (searchParams.get("order_dir") || "desc").toLowerCase() === "asc" ? "asc" : "desc";
@@ -29,7 +29,7 @@ export default function ProductsPage() {
     return { safePage, safeView, q, orderBy, orderDir };
   }, [searchParams]);
 
-  // ✅ Stati React inizializzati dall'URL
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -45,7 +45,6 @@ export default function ProductsPage() {
   const [orderBy, setOrderBy] = useState(urlState.orderBy);
   const [orderDir, setOrderDir] = useState(urlState.orderDir);
 
-  // ✅ Sync URL → STATE (se l'utente cambia URL o usa back/forward)
   useEffect(() => {
     if (page !== urlState.safePage) setPage(urlState.safePage);
     const nextIsList = urlState.safeView === "list";
@@ -57,7 +56,7 @@ export default function ProductsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlState]);
 
-  // ✅ Helper: aggiorna URL mantenendo gli altri parametri
+
   function updateUrlParams(patch) {
     const params = new URLSearchParams(searchParams);
 
@@ -69,13 +68,13 @@ export default function ProductsPage() {
       }
     });
 
-    // tieni sempre limit (se vuoi)
+    
     params.set("limit", String(limit));
 
     setSearchParams(params, { replace: false });
   }
 
-  // ✅ quando cambiano page/view/q/order → aggiorna URL
+
   useEffect(() => {
     updateUrlParams({
       page,
@@ -87,7 +86,7 @@ export default function ProductsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, isListMode, q, orderBy, orderDir]);
 
-  // 📡 FETCH prodotti (usa i parametri)
+
   useEffect(() => {
     let ignore = false;
 
@@ -138,7 +137,7 @@ export default function ProductsPage() {
     };
   }, [backendUrl, page, limit, q, orderBy, orderDir]);
 
-  // 🔒 evita page > totalPages
+
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [totalPages, page]);
@@ -169,7 +168,7 @@ export default function ProductsPage() {
                 <button
                   onClick={() => {
                     setIsListMode(false);
-                    setPage(1); // spesso conviene resettare pagina quando cambi filtro
+                    setPage(1);
                   }}
                   className={`ot-view-btn ${!isListMode ? "active" : ""}`}
                 >
@@ -188,17 +187,7 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            {/* 🔎 ESEMPIO SEARCH (opzionale) - se non lo vuoi, puoi rimuoverlo */}
-            {/* 
-            <div className="ot-filter-group">
-              <label>Cerca:</label>
-              <input
-                value={q}
-                onChange={(e) => { setQ(e.target.value); setPage(1); }}
-                placeholder="Cerca prodotto..."
-              />
-            </div>
-            */}
+
           </div>
 
           <div className={!isListMode ? "ot-products-grid" : "ot-products-list"}>
