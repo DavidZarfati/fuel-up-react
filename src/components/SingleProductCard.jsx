@@ -18,7 +18,6 @@ export default function SingleProductCard({ product }) {
 
   const navigate = useNavigate();
 
-  // controlliamo se il prodotto è nel carrello
   const cartItem = cart.find(item => item.id === product.id);
   const isInCart = !!cartItem;
   const quantity = cartItem?.quantity || 0;
@@ -29,6 +28,34 @@ export default function SingleProductCard({ product }) {
 
   return (
     <div className="card h-100 shadow-sm container pb-2" style={{ position: "relative" }}>
+
+      {/* ❤️ CUORE PREFERITI */}
+      <button
+        onClick={handleToggleFavourite}
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          background: "white",
+          border: "none",
+          borderRadius: "50%",
+          width: "35px",
+          height: "35px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          zIndex: 1,
+        }}
+      >
+        <i
+          className={isFavourite(product.id) ? "bi bi-heart-fill" : "bi bi-heart"}
+          style={{
+            color: isFavourite(product.id) ? "#b03c47ff" : "#666",
+            fontSize: "18px",
+          }}
+        ></i>
+      </button>
 
       <img
         src={`${backendBaseUrl}${product.image}`}
@@ -85,7 +112,6 @@ export default function SingleProductCard({ product }) {
           ) : (
 
             <>
-              {/* quantità */}
               <div className="d-flex align-items-center gap-1">
 
                 <button
