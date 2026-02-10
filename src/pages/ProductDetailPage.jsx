@@ -3,8 +3,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFavourites } from "../context/FavouritesContext";
 import { useCart } from "../context/CartContext";
+import { useToasts } from "../hooks/useToasts";
+import Toasts from "../components/Toasts";
 import RelatedProductsCarousel from "../components/CaroselProducts";
+import EmptyState from "../components/EmptyState";
 import "./ProductDetailPage.css";
+
+function formatPrice(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "EUR 0.00";
+  return `EUR ${amount.toFixed(2)}`;
+}
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -13,262 +22,149 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   const { isFavourite, toggleFavourite } = useFavourites();
-  const { cart, addToCart, increaseQuantity, decreaseQuantity, removeFromCart } = useCart();
+  const { addToCart } = useCart();
+  const {
+    toast,
+    showToast,
+    setShowToast,
+    favToast,
+    showFavToast,
+    setShowFavToast,
+    fireCartToast,
+    fireFavToast,
+  } = useToasts();
 
-  // Toast preferiti
-  const [favToast, setFavToast] = useState(null);
-  const [showFavToast, setShowFavToast] = useState(false);
-
-  // Carico prodotto
   useEffect(() => {
-    let cancelled = false;
-
+    let ignore = false;
     setLoading(true);
-    setError(null);
+    setError("");
 
     axios
       .get(`${backendBaseUrl}/api/products/${slug}`)
       .then((resp) => {
-        if (cancelled) return;
-        setProduct(resp.data);
-        setLoading(false);
+        if (!ignore) setProduct(resp.data);
       })
       .catch(() => {
-        if (cancelled) return;
-        setError("Prodotto non trovato");
-        setLoading(false);
+        if (!ignore) setError("Prodotto non trovato.");
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
       });
 
     return () => {
-      cancelled = true;
+      ignore = true;
     };
-  }, [slug, backendBaseUrl]);
+  }, [backendBaseUrl, slug]);
 
-  // Timer toast preferiti
-  useEffect(() => {
-    if (!favToast || !showFavToast) return;
-    const timer = setTimeout(() => setShowFavToast(false), 2500);
-    return () => clearTimeout(timer);
-  }, [favToast, showFavToast]);
-
-  // Prendo il prodotto vero dalla risposta
-  const p = useMemo(() => product?.result?.[0] ?? null, [product]);
-
-  // Stato carrello per questo prodotto
-  const cartItem = useMemo(() => {
-    if (!p) return null;
-    return cart.find((item) => item.id === p.id) || null;
-  }, [cart, p]);
-
-  const isInCart = !!cartItem;
-  const quantity = cartItem?.quantity || 0;
-
-  function handleToggleFav() {
-    if (!p) return;
-
-    const alreadyFav = isFavourite(p.id);
-    toggleFavourite(p);
-
-    if (!alreadyFav) {
-      setFavToast({
-        name: p.name,
-        time: "adesso",
-        image: `${backendBaseUrl}${p.image}`,
-      });
-      setShowFavToast(true);
-    }
-  }
+  const item = useMemo(() => product?.result?.[0] ?? null, [product]);
 
   function handleAddToCart() {
-    if (!p) return;
-    addToCart(p);
+    if (!item) return;
+    addToCart(item);
+    fireCartToast({
+      name: item.name,
+      time: "adesso",
+      image: `${backendBaseUrl}${item.image}`,
+      message: "Hai aggiunto al carrello:",
+    });
   }
 
-  function handleIncrease() {
-    if (!p) return;
-    increaseQuantity(p.id);
+  function handleToggleFavourite() {
+    if (!item) return;
+    const wasFavourite = isFavourite(item.id);
+    toggleFavourite(item);
+    fireFavToast({
+      name: item.name,
+      time: "adesso",
+      image: `${backendBaseUrl}${item.image}`,
+      message: wasFavourite ? "Hai rimosso dai preferiti:" : "Hai aggiunto ai preferiti:",
+    });
   }
 
-  function handleDecrease() {
-    if (!p) return;
-
-    // Se sei a 1 e premi -, lo tolgo direttamente (UX più comoda)
-    if (quantity <= 1) {
-      removeFromCart(p.id);
-      return;
-    }
-    decreaseQuantity(p.id);
+  if (loading) {
+    return (
+      <section className="page-section">
+        <div className="app-container">
+          <div className="surface-card state-card">Caricamento prodotto...</div>
+        </div>
+      </section>
+    );
   }
 
-  function handleRemove() {
-    if (!p) return;
-    removeFromCart(p.id);
+  if (error || !item) {
+    return (
+      <section className="page-section">
+        <div className="app-container">
+          <EmptyState icon="bi bi-exclamation-circle" title="Prodotto non disponibile" description={error || "Dati prodotto non disponibili."} ctaLabel="Torna ai prodotti" ctaTo="/products" />
+        </div>
+      </section>
+    );
   }
 
-  if (loading) return <div>Loading...</div>;
-  if (!loading && error) return <div>{error}</div>;
-  if (!loading && !error && !p) return <div>Product data not available.</div>;
+  const hasDiscount =
+    Number(item.discount_price) > 0 && Number(item.discount_price) < Number(item.price);
 
   return (
-    <>
-      <div className="d-flex flex-column">
-        {/* IMMAGINE + CUORE */}
-        <div className="ml-image-wrap align-self-center position-relative">
-          <img
-            src={`${backendBaseUrl}${p.image}`}
-            alt={p.name}
-            style={{ width: "300px", height: "auto", display: "block", margin: "0 0 15px 0" }}
-          />
+    <section className="page-section">
+      <div className="app-container">
+        <article className="surface-card detail-layout">
+          <div className="detail-image-wrap">
+            <img src={`${backendBaseUrl}${item.image}`} alt={item.name} className="detail-image" />
+            <button
+              type="button"
+              className={`detail-heart ${isFavourite(item.id) ? "active" : ""}`}
+              onClick={handleToggleFavourite}
+              aria-label={isFavourite(item.id) ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+            >
+              <i className={isFavourite(item.id) ? "bi bi-heart-fill" : "bi bi-heart"}></i>
+            </button>
+          </div>
 
-          <button
-            onClick={handleToggleFav}
-            className="ot-heart-button"
-            aria-label={isFavourite(p.id) ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
-            style={{
-              position: "absolute",
-              top: "12px",
-              right: "12px",
-              background: "white",
-              border: "none",
-              borderRadius: "50%",
-              width: "35px",
-              height: "35px",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              zIndex: 10,
-            }}
-          >
-            <i
-              className={isFavourite(p.id) ? "bi bi-heart-fill" : "bi bi-heart"}
-              style={{ color: isFavourite(p.id) ? "#dc3545" : "#666", fontSize: "18px" }}
-            />
-          </button>
-        </div>
+          <div className="detail-content">
+            <h1 className="title-lg">{item.name}</h1>
+            <p className="text-muted">{item.description || "Nessuna descrizione disponibile."}</p>
 
-        {/* TESTO */}
-        <h2 className="dz-titolo-prodotto">
-          {p.name || "No name available."} <span className="dz-brand-badge">{p.brand}</span>
-        </h2>
+            <div className="detail-meta-grid">
+              {item.brand && <p><strong>Brand:</strong> {item.brand}</p>}
+              {item.size && <p><strong>Formato:</strong> {item.size}</p>}
+              {item.color && <p><strong>Colore:</strong> {item.color}</p>}
+              {item.flavor && <p><strong>Gusto:</strong> {item.flavor}</p>}
+            </div>
 
-        <p className="dz-description-prodotto">{p.description || "No description available."}</p>
+            {item.manufacturer_note && <p className="detail-note">{item.manufacturer_note}</p>}
 
-        {p.size && <p className="dz-description-prodotto">Size: {p.size}</p>}
+            <div className="price-row">
+              {hasDiscount ? (
+                <>
+                  <span className="price-old">{formatPrice(item.price)}</span>
+                  <span className="price-discount">{formatPrice(item.discount_price)}</span>
+                </>
+              ) : (
+                <span className="price-now">{formatPrice(item.price)}</span>
+              )}
+            </div>
 
-        {p.manufacturer_note && (
-          <p className="dz-description-prodotto">Additional information: {p.manufacturer_note}</p>
-        )}
-
-        {(p.color || p.flavor) && (
-          <p className="dz-description-prodotto">
-            {p.color ? `Color: ${p.color}` : `Taste: ${p.flavor}`}
-          </p>
-        )}
-
-        {/* PREZZO */}
-        <div className="d-flex justify-content-around">
-          {p.discount_price && p.discount_price < p.price ? (
-            <>
-              <p className="dz-description-prodotto">
-                Prezzo Base: <span className="dz-prodotto-senza-sconto">€{p.price}</span>
-              </p>
-              <p className="dz-description-prodotto">
-                Prezzo Scontato: <span className="dz-prezzo-scontato">€{p.discount_price}</span>
-              </p>
-            </>
-          ) : (
-            <p className="dz-description-prodotto">
-              Prezzo: <span className="dz-prezzo-regular">€{p.price}</span>
-            </p>
-          )}
-        </div>
-
-        {/* ✅ SEZIONE CARRELLO MIGLIORATA */}
-        <div className="d-flex justify-content-center" style={{ marginTop: 20 }}>
-          {!isInCart ? (
-            <button className="btn btn-primary" onClick={handleAddToCart}>
+            <button type="button" className="btn-ui btn-ui-primary detail-cart-btn" onClick={handleAddToCart}>
               Aggiungi al carrello
             </button>
-          ) : (
-            <div className="d-flex flex-wrap align-items-center gap-2">
-              <div className="d-flex align-items-center gap-1">
-                <button className="btn btn-outline-secondary btn-sm" onClick={handleDecrease}>
-                  -
-                </button>
-                <span className="fw-bold" style={{ minWidth: 24, textAlign: "center" }}>
-                  {quantity}
-                </span>
-                <button className="btn btn-outline-secondary btn-sm" onClick={handleIncrease}>
-                  +
-                </button>
-              </div>
-
-              <button className="btn btn-success btn-sm" onClick={() => navigate("/shopping-cart")}>
-                Vai al carrello
-              </button>
-
-              <button className="btn btn-outline-danger btn-sm" onClick={handleRemove}>
-                Rimuovi
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Toast preferiti */}
-        {favToast && showFavToast && (
-          <div className="toast-container position-fixed" style={{ bottom: 90, right: 30, zIndex: 9999 }}>
-            <div
-              className="toast show"
-              role="alert"
-              aria-live="assertive"
-              aria-atomic="true"
-              style={{
-                minWidth: 320,
-                background: "#fff",
-                borderRadius: 8,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-              }}
-            >
-              <div
-                className="toast-header"
-                style={{
-                  background: "#f5f5f5",
-                  borderTopLeftRadius: 8,
-                  borderTopRightRadius: 8,
-                }}
-              >
-                <img
-                  src={favToast.image}
-                  className="rounded me-2"
-                  alt={favToast.name}
-                  style={{ width: 32, height: 32, objectFit: "cover", marginRight: 8 }}
-                />
-                <strong className="me-auto">Preferiti</strong>
-                <small className="text-body-secondary">{favToast.time}</small>
-                <button
-                  type="button"
-                  className="btn-close"
-                  aria-label="Close"
-                  onClick={() => setShowFavToast(false)}
-                  style={{ marginLeft: 8, border: "none", background: "transparent", fontSize: 18 }}
-                >
-                  ×
-                </button>
-              </div>
-              <div className="toast-body" style={{ padding: "12px 24px", fontSize: 18 }}>
-                Hai aggiunto <b>{favToast.name}</b> ai preferiti
-              </div>
-            </div>
           </div>
-        )}
+        </article>
+
+        <RelatedProductsCarousel slug={slug} />
       </div>
 
-      <RelatedProductsCarousel slug={slug} />
-    </>
+      <Toasts
+        toast={toast}
+        showToast={showToast}
+        setShowToast={setShowToast}
+        favToast={favToast}
+        showFavToast={showFavToast}
+        setShowFavToast={setShowFavToast}
+      />
+    </section>
   );
 }
 

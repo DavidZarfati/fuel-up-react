@@ -1,0 +1,94 @@
+.about-layout {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.about-hero {
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+  background:
+    radial-gradient(circle at top right, rgba(34, 211, 238, 0.16), transparent 35%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(17, 24, 39, 0.95));
+}
+
+.about-kicker {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #bae6fd;
+  font-weight: 700;
+}
+
+.about-content {
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.about-content p {
+  color: #d1d5db;
+}
+
+.about-values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.about-value-card {
+  padding: var(--space-2);
+  display: grid;
+  gap: 10px;
+  background: var(--mp-surface-2);
+}
+
+.about-value-card i {
+  color: var(--mp-accent);
+  font-size: 22px;
+}
+
+.about-value-card h3 {
+  font-size: 17px;
+}
+
+.about-value-card p {
+  color: var(--mp-muted);
+  font-size: var(--font-size-sm);
+}
+
+.about-contact {
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.about-contact-items {
+  display: grid;
+  gap: 10px;
+}
+
+.about-contact-items p {
+  color: #dbeafe;
+}
+
+.about-contact-items i {
+  color: var(--mp-accent);
+  margin-right: 8px;
+}
+
+@media (max-width: 1080px) {
+  .about-values-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .about-hero {
+    padding: var(--space-3);
+  }
+
+  .about-values-grid {
+    grid-template-columns: 1fr;
+  }
+}

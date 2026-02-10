@@ -1,49 +1,46 @@
-import "bootstrap/dist/css/bootstrap.css";
 import "./Footer.css";
+import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.jpg";
-import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function Footer() {
-    return (
-        <>
-            <footer className="ot-footer">
-                <div className="ot-footer-content">
-                    
-                    <div className="ot-footer-column">
-                        <img
-                            className="ot-footer-logo"
-                            src={logo}
-                            alt="Logo FuelUp"
-                        />
-                        <ul className="ot-footer-list">
-                            <li>Via esempio,1234</li>
-                            <li>Selling Products is: Fitness</li>
-                        </ul>
-                    </div>
+  return (
+    <footer className="ot-footer">
+      <div className="app-container ot-footer-content">
+        <div className="ot-footer-brand">
+          <img src={logo} alt="FuelUp logo" />
+          <h3>FuelUp</h3>
+          <p>Premium Fitness Nutrition</p>
+          <small>Via esempio 1234, Italia</small>
+        </div>
 
-                    <div className="ot-footer-column">
-                        <h2 className="ot-footer-title">I nostri Servizi</h2>
-                        <ul className="ot-footer-list">
-                            <li>Integratori</li>
-                            <li>Abbigliamento</li>
-                            <li>Pesi</li>
-                            <li>Corsi Fitness</li>
-                        </ul>
-                    </div>
+        <div className="ot-footer-column">
+          <h4>Shop</h4>
+          <Link to="/products">Prodotti</Link>
+          <Link to="/products?on_sale=1">Offerte</Link>
+          <Link to="/products/favourites">Wishlist</Link>
+        </div>
 
-                    <div className="ot-footer-column">
-                        <h2 className="ot-footer-title">I nostri Social</h2>
-                        <ul className="ot-footer-list ot-footer-social">
-                            <li><i className="bi bi-facebook"></i><a href="#">fuelUp_facebook</a></li>
-                            <li><i className="bi bi-instagram"></i><a href="#">fuelUp_official</a></li>
-                            <li><i className="bi bi-pinterest"></i><a href="#">fuelUp_pinterest</a></li>
-                            <li><i className="bi bi-twitter-x"></i><a href="#">fuelUp_x</a></li>
-                            <li><i className="bi bi-tiktok"></i><a href="#">fuelUp_tikTok</a></li>
-                        </ul>
-                    </div>
+        <div className="ot-footer-column">
+          <h4>Categorie</h4>
+          <Link to="/products?category=1">Integratori</Link>
+          <Link to="/products?category=2">Abbigliamento</Link>
+          <Link to="/products?category=3">Accessori</Link>
+          <Link to="/products?category=4">Snacks</Link>
+        </div>
 
-                </div>
-            </footer>
-        </>
-    );
+        <div className="ot-footer-column">
+          <h4>Supporto</h4>
+          <p>
+            <i className="bi bi-lightning-charge"></i> Spedizione rapida
+          </p>
+          <p>
+            <i className="bi bi-shield-check"></i> Pagamenti sicuri
+          </p>
+          <p>
+            <i className="bi bi-headset"></i> Supporto dedicato
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
 }

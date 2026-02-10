@@ -1,60 +1,85 @@
-.dz-prezzo-scontato {
-    color: red;
+.detail-layout {
+  padding: var(--space-3);
+  display: grid;
+  grid-template-columns: minmax(280px, 460px) 1fr;
+  gap: var(--space-3);
 }
 
-.dz-titolo-prodotto {
-    text-align: center;
-    margin-bottom: 30px;
+.detail-image-wrap {
+  position: relative;
 }
 
-.dz-description-prodotto {
-    text-align: center;
+.detail-image {
+  width: 100%;
+  height: 430px;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, #0f172a, #111826);
 }
 
-.dz-brand-badge {
-    background-color: red;
-    padding: 15px;
-    border-radius: 50px;
-    color: white;
+.detail-heart {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--mp-border-strong);
+  background: rgba(11, 15, 20, 0.78);
+  color: var(--mp-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-.ml-image-wrap {
-    position: relative;
-    display: inline-block;
-    margin: 0px 0px;
-    max-width: 320px;
+.detail-heart.active {
+  color: #fda4af;
+  border-color: rgba(239, 68, 68, 0.7);
 }
 
-.ml-main-image {
-    max-width: 20%;
-    height: auto;
-    display: inline-block;
-    margin: 40px auto;
-    border: 1px solid black;
+.detail-content {
+  display: grid;
+  gap: var(--space-2);
 }
 
-.dz-brand-badge {
-    animation: cambiaColore 10s infinite;
+.detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
 }
 
-@keyframes cambiaColore {
-    0% {
-        background-color: red;
-    }
-
-    33% {
-        background-color: blue;
-    }
-
-    66% {
-        background-color: green;
-    }
-
-    100% {
-        background-color: red;
-    }
+.detail-meta-grid p {
+  color: #d1d5db;
+  font-size: var(--font-size-sm);
 }
 
-.dz-prodotto-senza-sconto {
-    text-decoration: line-through;
+.detail-note {
+  color: #bfdbfe;
+  font-size: var(--font-size-sm);
+}
+
+.detail-cart-btn {
+  width: fit-content;
+  min-width: 200px;
+}
+
+@media (max-width: 940px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-image {
+    height: 320px;
+  }
+}
+
+@media (max-width: 620px) {
+  .detail-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-cart-btn {
+    width: 100%;
+  }
 }

@@ -1,0 +1,36 @@
+:root {
+  --mp-bg: #0b0f14;
+  --mp-surface: #111826;
+  --mp-surface-2: #0f172a;
+  --mp-text: #e5e7eb;
+  --mp-muted: #9ca3af;
+  --mp-accent: #22d3ee;
+  --mp-accent-2: #3b82f6;
+  --mp-danger: #ef4444;
+  --mp-success: #22c55e;
+  --mp-border: rgba(229, 231, 235, 0.1);
+  --mp-border-strong: rgba(229, 231, 235, 0.2);
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+
+  --shadow-soft: 0 8px 20px -16px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 18px 30px -24px rgba(0, 0, 0, 0.85);
+  --shadow-glow: 0 0 0 1px rgba(34, 211, 238, 0.16), 0 20px 34px -24px rgba(34, 211, 238, 0.35);
+
+  --container-max: 1280px;
+  --font-base: "Cabin", "Segoe UI", sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --font-size-2xl: 44px;
+}

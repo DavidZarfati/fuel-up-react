@@ -2,83 +2,88 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
-import SingleProductCard from "../components/SingleProductCard";
-import SingleProductList from "../components/SingleProductList";
+import CategoryPills from "../components/CategoryPills";
+import ViewToggle from "../components/ViewToggle";
+import ProductCard from "../components/ProductCard";
+import ProductRow from "../components/ProductRow";
+import EmptyState from "../components/EmptyState";
 import "./ProductsPage.css";
+
+const CATEGORY_FILTERS = [
+  { label: "Tutti", value: "" },
+  { label: "Integratori", value: 1 },
+  { label: "Abbigliamento", value: 2 },
+  { label: "Accessori", value: 3 },
+  { label: "Cibo & Snacks", value: 4 },
+];
+
+function hasDiscount(product) {
+  const discount = Number(product.discount_price);
+  const price = Number(product.price);
+  return Number.isFinite(discount) && Number.isFinite(price) && discount > 0 && discount < price;
+}
 
 export default function ProductsPage() {
   const { backendUrl } = useGlobal();
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const urlState = useMemo(() => {
     const pageFromUrl = parseInt(searchParams.get("page") || "1", 10);
     const safePage = Number.isFinite(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1;
-
     const view = searchParams.get("view") || "grid";
     const safeView = view === "list" ? "list" : "grid";
-
     const q = searchParams.get("q") || "";
     const orderBy = searchParams.get("order_by") || "created_at";
-    const orderDir =
-      (searchParams.get("order_dir") || "desc").toLowerCase() === "asc" ? "asc" : "desc";
-
-    return { safePage, safeView, q, orderBy, orderDir };
+    const orderDir = (searchParams.get("order_dir") || "desc").toLowerCase() === "asc" ? "asc" : "desc";
+    const category = searchParams.get("category") || "";
+    const onSaleOnly = searchParams.get("on_sale") === "1";
+    return { safePage, safeView, q, orderBy, orderDir, category, onSaleOnly };
   }, [searchParams]);
 
   const limit = 12;
-
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [page, setPage] = useState(urlState.safePage);
   const [totalPages, setTotalPages] = useState(1);
-
-  const [isListMode, setIsListMode] = useState(urlState.safeView === "list");
-
+  const [view, setView] = useState(urlState.safeView);
   const [q, setQ] = useState(urlState.q);
   const [orderBy, setOrderBy] = useState(urlState.orderBy);
   const [orderDir, setOrderDir] = useState(urlState.orderDir);
+  const [category, setCategory] = useState(urlState.category ? Number(urlState.category) : "");
+  const [onSaleOnly, setOnSaleOnly] = useState(urlState.onSaleOnly);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Sync stato da URL
   useEffect(() => {
     if (page !== urlState.safePage) setPage(urlState.safePage);
-
-    const nextIsList = urlState.safeView === "list";
-    if (isListMode !== nextIsList) setIsListMode(nextIsList);
-
+    if (view !== urlState.safeView) setView(urlState.safeView);
     if (q !== urlState.q) setQ(urlState.q);
     if (orderBy !== urlState.orderBy) setOrderBy(urlState.orderBy);
     if (orderDir !== urlState.orderDir) setOrderDir(urlState.orderDir);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const nextCategory = urlState.category ? Number(urlState.category) : "";
+    if (category !== nextCategory) setCategory(nextCategory);
+    if (onSaleOnly !== urlState.onSaleOnly) setOnSaleOnly(urlState.onSaleOnly);
   }, [urlState]);
 
-  function updateUrlParams(patch) {
+  useEffect(() => {
     const params = new URLSearchParams(searchParams);
 
-    Object.entries(patch).forEach(([key, value]) => {
-      if (value === null || value === undefined || value === "") params.delete(key);
-      else params.set(key, String(value));
-    });
-
+    if (page > 1) params.set("page", String(page));
+    else params.delete("page");
+    params.set("view", view);
+    if (q) params.set("q", q);
+    else params.delete("q");
+    params.set("order_by", orderBy);
+    params.set("order_dir", orderDir);
     params.set("limit", String(limit));
+    if (category !== "") params.set("category", String(category));
+    else params.delete("category");
+    if (onSaleOnly) params.set("on_sale", "1");
+    else params.delete("on_sale");
+
     setSearchParams(params, { replace: false });
-  }
+  }, [page, view, q, orderBy, orderDir, category, onSaleOnly]);
 
-  // Scrivo su URL quando cambia lo stato
-  useEffect(() => {
-    updateUrlParams({
-      page,
-      view: isListMode ? "list" : "grid",
-      q,
-      order_by: orderBy,
-      order_dir: orderDir,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, isListMode, q, orderBy, orderDir]);
-
-  // Fetch prodotti
   useEffect(() => {
     let ignore = false;
 
@@ -96,23 +101,20 @@ export default function ProductsPage() {
 
         const resp = await axios.get(`${backendUrl}/api/products?${params.toString()}`);
         const data = resp.data;
-
         const list = Array.isArray(data?.result) ? data.result : [];
-
-        let pagine = 1;
+        let pages = 1;
         if (data?.info) {
-          if (typeof data.info.totale_pagine === "number") pagine = data.info.totale_pagine;
-          else if (typeof data.info.pages === "number") pagine = data.info.pages;
+          if (typeof data.info.totale_pagine === "number") pages = data.info.totale_pagine;
+          else if (typeof data.info.pages === "number") pages = data.info.pages;
         } else if (typeof data?.totale_pagine === "number") {
-          pagine = data.totale_pagine;
+          pages = data.totale_pagine;
         }
 
         if (!ignore) {
           setProducts(list);
-          setTotalPages(pagine);
+          setTotalPages(pages);
         }
-      } catch (e) {
-        console.log(e);
+      } catch {
         if (!ignore) setError("Errore nel caricamento dei prodotti.");
       } finally {
         if (!ignore) setLoading(false);
@@ -123,112 +125,135 @@ export default function ProductsPage() {
     return () => {
       ignore = true;
     };
-  }, [backendUrl, page, limit, q, orderBy, orderDir]);
+  }, [backendUrl, page, q, orderBy, orderDir]);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [totalPages, page]);
 
+  const visibleProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesCategory = category === "" || Number(product.macro_categories_id) === Number(category);
+      const matchesSale = !onSaleOnly || hasDiscount(product);
+      return matchesCategory && matchesSale;
+    });
+  }, [products, category, onSaleOnly]);
+
   return (
-    <section className="ot-products-page-container">
-      <div className="ot-products-page-header">
-        <h1>Prodotti professionali per risultati reali</h1>
-      </div>
-
-      {loading && (
-        <div className="ot-loading-container">
-          <p>Caricamento...</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="ot-error-message">
-          <p>{error}</p>
-        </div>
-      )}
-
-      {!loading && !error && (
-        <>
-          <div className="ot-products-filters">
-            <div className="ot-filter-group">
-              <label>Visualizza:</label>
-
-              <div className="ot-view-buttons">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsListMode(false);
-                    setPage(1);
-                  }}
-                  className={`ot-view-btn ${!isListMode ? "active" : ""}`}
-                >
-                  <i className="bi bi-grid-3x3-gap"></i> Griglia
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsListMode(true);
-                    setPage(1);
-                  }}
-                  className={`ot-view-btn ${isListMode ? "active" : ""}`}
-                >
-                  <i className="bi bi-list-ul"></i> Lista
-                </button>
-              </div>
-            </div>
+    <section className="page-section">
+      <div className="app-container">
+        <div className="products-page-header surface-card">
+          <div>
+            <h1 className="title-lg">Catalogo FuelUp PRO</h1>
+            <p className="text-muted">Prodotti premium in stile fitness performance dark.</p>
           </div>
+          <button type="button" className="btn-ui btn-ui-outline products-filter-toggle" onClick={() => setFiltersOpen((value) => !value)}>
+            <i className="bi bi-sliders"></i>
+            Filtri
+          </button>
+        </div>
 
-          {/* GRIGLIA */}
-          {!isListMode ? (
-            <div className="ot-products-grid">
-              {products.map((p, index) => (
-                <div className="ot-product-card-wrapper" key={p.id ?? p._id ?? index}>
-                  {/* niente onToggleFavourite: lo gestisce la card internamente */}
-                  <SingleProductCard product={p} />
-                </div>
-              ))}
+        <div className="products-page-layout">
+          <aside className={`surface-card products-filters-panel ${filtersOpen ? "open" : ""}`}>
+            <div className="toolbar-group">
+              <span className="toolbar-label">Categorie</span>
+              <CategoryPills categories={CATEGORY_FILTERS} selectedValue={category} onChange={setCategory} />
             </div>
-          ) : (
-            /* LISTA */
-            <div className="ot-products-list">
-              {products.map((p, index) => (
-                <div className="ot-product-list-wrapper" key={p.id ?? p._id ?? index}>
-                  {/* niente cuore esterno: lo gestisce SingleProductList */}
-                  <SingleProductList product={p} />
-                </div>
-              ))}
+
+            <div className="toolbar-group">
+              <span className="toolbar-label">Offerte</span>
+              <label className="products-sale-switch">
+                <input type="checkbox" checked={onSaleOnly} onChange={(event) => setOnSaleOnly(event.target.checked)} />
+                <span>Mostra solo scontati</span>
+              </label>
             </div>
-          )}
 
-          {/* PAGINAZIONE */}
-          {totalPages > 1 && (
-            <div className="ot-pagination-container">
-              <button
-                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                disabled={page === 1}
-                className="ot-pagination-btn"
-              >
-                ← Indietro
-              </button>
+            <div className="toolbar-group">
+              <span className="toolbar-label">Ordinamento</span>
+              <select className="select-ui" value={orderBy} onChange={(event) => { setOrderBy(event.target.value); setPage(1); }}>
+                <option value="created_at">Data creazione</option>
+                <option value="name">Nome</option>
+                <option value="price">Prezzo</option>
+                <option value="brand">Brand</option>
+              </select>
+              <select className="select-ui" value={orderDir} onChange={(event) => { setOrderDir(event.target.value); setPage(1); }}>
+                <option value="desc">Decrescente</option>
+                <option value="asc">Crescente</option>
+              </select>
+            </div>
+          </aside>
 
-              <div className="ot-pagination-info">
-                <span>
-                  Pagina <strong>{page}</strong> di <strong>{totalPages}</strong>
-                </span>
+          <div className="products-main">
+            <div className="surface-card toolbar products-main-toolbar">
+              <div className="toolbar-group">
+                <span className="toolbar-label">Visualizza</span>
+                <ViewToggle value={view} onChange={(nextView) => { setView(nextView); setPage(1); }} />
               </div>
-
-              <button
-                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={page === totalPages}
-                className="ot-pagination-btn"
-              >
-                Avanti →
-              </button>
+              <div className="products-count text-muted">{visibleProducts.length} prodotti visualizzati</div>
             </div>
-          )}
-        </>
-      )}
+
+            {loading && (
+              <div className="surface-card state-card">
+                <p>Caricamento prodotti...</p>
+              </div>
+            )}
+
+            {!loading && error && <EmptyState icon="bi bi-exclamation-circle" title="Errore" description={error} />}
+
+            {!loading && !error && visibleProducts.length === 0 && (
+              <EmptyState
+                icon="bi bi-search"
+                title="Nessun prodotto trovato"
+                description="Modifica i filtri o resetta la ricerca per vedere piu risultati."
+                ctaLabel="Reset filtri"
+                ctaTo="/products"
+              />
+            )}
+
+            {!loading && !error && visibleProducts.length > 0 && (
+              <>
+                {view === "grid" ? (
+                  <div className="products-grid">
+                    {visibleProducts.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="products-list">
+                    {visibleProducts.map((product) => (
+                      <ProductRow key={product.id} product={product} />
+                    ))}
+                  </div>
+                )}
+
+                {totalPages > 1 && (
+                  <div className="surface-card pagination">
+                    <button
+                      type="button"
+                      className="btn-ui btn-ui-outline"
+                      onClick={() => setPage((current) => Math.max(current - 1, 1))}
+                      disabled={page === 1}
+                    >
+                      Indietro
+                    </button>
+                    <span>
+                      Pagina <strong>{page}</strong> di <strong>{totalPages}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      className="btn-ui btn-ui-outline"
+                      onClick={() => setPage((current) => Math.min(current + 1, totalPages))}
+                      disabled={page === totalPages}
+                    >
+                      Avanti
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
