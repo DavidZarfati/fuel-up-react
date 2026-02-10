@@ -426,68 +426,6 @@ export default function HomePage() {
                                                     <p className="card-text">{isGridMode === "" ? "" : card.description}</p>
                                                     <div className="ot-list-card-actions">
                                                         <Link to={`/products/${card.slug}`} className="btn btn-outline-primary btn-sm">
-                                                            Vedi dettagli
-                                                        </Link>
-                                                        {/* <button
-                                                            onClick={() => {
-                                                                addToCart(card);
-                                                                setToast({
-                                                                    name: card.name,
-                                                                    time: 'adesso',
-                                                                    image: `${backendBaseUrl}${card.image}`
-                                                                });
-                                                                setShowToast(true);
-                                                            }}
-                                                            className="btn btn-primary btn-sm"
-                                                        >
-                                                            Aggiungi <i className="bi bi-cart-plus"></i>
-                                                        </button> */}
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                                : products.filter(card => card.macro_categories_id === categoria).map((card, idx) => (
-                                    <div className="col-12" key={idx}>
-                                        <div className="card mb-3 ot-product-card-list">
-                                            {/* HEART ICON */}
-                                            <button
-                                                onClick={() => {
-                                                    toggleFavourite(card);
-                                                    if (!isFavourite(card.id)) {
-                                                        setFavToast({
-                                                            name: card.name,
-                                                            time: 'adesso',
-                                                            image: `${backendBaseUrl}${card.image}`
-                                                        });
-                                                        setShowFavToast(true);
-                                                    }
-                                                }}
-                                                className="ot-heart-button"
-                                                aria-label={isFavourite(card.id) ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
-                                            >
-                                                <i
-                                                    className={isFavourite(card.id) ? "bi bi-heart-fill" : "bi bi-heart"}
-                                                    style={{
-                                                        color: isFavourite(card.id) ? "#dc3545" : "#666",
-                                                        fontSize: "18px",
-                                                    }}
-                                                ></i>
-                                            </button>
-
-                                            <div className="ot-list-card-body dz-card-body">
-                                                <img
-                                                    src={`${backendBaseUrl}${card.image}`}
-                                                    alt={card.name}
-                                                    className="ot-list-card-image"
-                                                />
-                                                <div className="ot-list-card-content">
-                                                    <h5 className="card-title">{card.name}</h5>
-                                                    <p className="card-text">{isGridMode === "" ? "" : card.description}</p>
-                                                    <div className="ot-list-card-actions">
-                                                        <Link to={`/products/${card.slug}`} className="btn btn-outline-primary btn-sm">
                                                             Dettagli
                                                         </Link>
                                                         {(() => {
@@ -497,7 +435,15 @@ export default function HomePage() {
                                                             if (!isInCart) {
                                                                 return (
                                                                     <button
-                                                                        onClick={() => addToCart(card)}
+                                                                        onClick={() => {
+                                                                            addToCart(card);
+                                                                            setToast({
+                                                                                name: card.name,
+                                                                                time: 'adesso',
+                                                                                image: `${backendBaseUrl}${card.image}`
+                                                                            });
+                                                                            setShowToast(true);
+                                                                        }}
                                                                         className="btn btn-primary btn-sm"
                                                                     >
                                                                         Aggiungi
@@ -543,6 +489,147 @@ export default function HomePage() {
                                         </div>
                                     </div>
                                 ))
+                                : products.filter(card => card.macro_categories_id === categoria).map((card, idx) => (
+                                    <div className="col-12" key={idx}>
+                                        <div className="card mb-3 ot-product-card-list">
+                                            {/* HEART ICON */}
+                                            <button
+                                                onClick={() => {
+                                                    toggleFavourite(card);
+                                                    if (!isFavourite(card.id)) {
+                                                        setFavToast({
+                                                            name: card.name,
+                                                            time: 'adesso',
+                                                            image: `${backendBaseUrl}${card.image}`
+                                                        });
+                                                        setShowFavToast(true);
+                                                    }
+                                                }}
+                                                className="ot-heart-button"
+                                                aria-label={isFavourite(card.id) ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+                                            >
+                                                <i
+                                                    className={isFavourite(card.id) ? "bi bi-heart-fill" : "bi bi-heart"}
+                                                    style={{
+                                                        color: isFavourite(card.id) ? "#dc3545" : "#666",
+                                                        fontSize: "18px",
+                                                    }}
+                                                ></i>
+                                            </button>
+                                            <div className="ot-list-card-body dz-card-body">
+                                                <img
+                                                    src={`${backendBaseUrl}${card.image}`}
+                                                    alt={card.name}
+                                                    className="ot-list-card-image"
+                                                />
+                                                <div className="ot-list-card-content">
+                                                    <h5 className="card-title">{card.name}</h5>
+                                                    <p className="card-text">{isGridMode === "" ? "" : card.description}</p>
+                                                    <div className="ot-list-card-actions">
+                                                        <Link to={`/products/${card.slug}`} className="btn btn-outline-primary btn-sm">
+                                                            Dettagli
+                                                        </Link>
+                                                        {(() => {
+                                                            const cartItem = cart.find(item => item.id === card.id);
+                                                            const isInCart = !!cartItem;
+                                                            const quantity = cartItem?.quantity || 0;
+                                                            if (!isInCart) {
+                                                                return (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            addToCart(card);
+                                                                            setToast({
+                                                                                name: card.name,
+                                                                                time: 'adesso',
+                                                                                image: `${backendBaseUrl}${card.image}`
+                                                                            });
+                                                                            setShowToast(true);
+                                                                        }}
+                                                                        className="btn btn-primary btn-sm"
+                                                                    >
+                                                                        Aggiungi
+                                                                    </button>
+                                                                );
+                                                            } else {
+                                                                return (
+                                                                    <>
+                                                                        <div className="d-flex align-items-center gap-1">
+                                                                            <button
+                                                                                onClick={() => decreaseQuantity(card.id)}
+                                                                                className="btn btn-outline-secondary btn-sm"
+                                                                            >
+                                                                                -
+                                                                            </button>
+                                                                            <span className="fw-bold">{quantity}</span>
+                                                                            <button
+                                                                                onClick={() => increaseQuantity(card.id)}
+                                                                                className="btn btn-outline-secondary btn-sm"
+                                                                            >
+                                                                                +
+                                                                            </button>
+                                                                        </div>
+                                                                        <button
+                                                                            onClick={() => navigate("/shopping-cart")}
+                                                                            className="btn btn-success btn-sm"
+                                                                        >
+                                                                            Carrello
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => removeFromCart(card.id)}
+                                                                            className="btn btn-outline-danger btn-sm"
+                                                                        >
+                                                                            Rimuovi
+                                                                        </button>
+                                                                    </>
+                                                                );
+                                                            }
+                                                        })()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                        )}
+                        {favToast && showFavToast && (
+                            <div className="toast-container position-fixed" style={{ bottom: 90, right: 30, zIndex: 9999 }}>
+                                <div className="toast show" role="alert" aria-live="assertive" aria-atomic="true" style={{ minWidth: 320, background: '#fff', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                                    <div className="toast-header" style={{ background: '#f5f5f5', borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+                                        <img src={favToast.image} className="rounded me-2" alt={favToast.name} style={{ width: 32, height: 32, objectFit: 'cover', marginRight: 8 }} />
+                                        <strong className="me-auto">Preferiti</strong>
+                                        <small className="text-body-secondary">{favToast.time}</small>
+                                        <button type="button" className="btn-close" aria-label="Close" onClick={() => setShowFavToast(false)} style={{ marginLeft: 8, border: 'none', background: 'transparent', fontSize: 18 }}>×</button>
+                                    </div>
+                                    <div className="toast-body" style={{ padding: '12px 24px', fontSize: 18 }}>
+                                        Hai aggiunto <b>{favToast.name}</b> ai preferiti
+                                        <div style={{ marginTop: 12 }}>
+                                            <Link to="products/favourites" className="btn btn-danger btn-sm" style={{ fontWeight: 'bold', fontSize: 16 }} onClick={() => setShowFavToast(false)}>
+                                                Vedi nella pagina dei preferiti
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {toast && showToast && (
+                            <div className="toast-container position-fixed" style={{ bottom: 30, right: 30, zIndex: 9999 }}>
+                                <div className="toast show" role="alert" aria-live="assertive" aria-atomic="true" style={{ minWidth: 320, background: '#fff', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                                    <div className="toast-header" style={{ background: '#f5f5f5', borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+                                        <img src={toast.image} className="rounded me-2" alt={toast.name} style={{ width: 32, height: 32, objectFit: 'cover', marginRight: 8 }} />
+                                        <strong className="me-auto">Carrello</strong>
+                                        <small className="text-body-secondary">{toast.time}</small>
+                                        <button type="button" className="btn-close" aria-label="Close" onClick={() => setShowToast(false)} style={{ marginLeft: 8, border: 'none', background: 'transparent', fontSize: 18 }}>×</button>
+                                    </div>
+                                    <div className="toast-body" style={{ padding: '12px 24px', fontSize: 18 }}>
+                                        Hai aggiunto <b>{toast.name}</b> al carrello
+                                        <div style={{ marginTop: 12 }}>
+                                            <Link to="/shopping-cart" className="btn btn-success btn-sm" style={{ fontWeight: 'bold', fontSize: 16 }} onClick={() => setShowToast(false)}>
+                                                Vedi nel carrello
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 )}
