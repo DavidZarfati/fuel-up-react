@@ -124,11 +124,22 @@ export default function SingleProductCard({ product }) {
             </p>
           )}
 
-          {product.price != null && (
-            <p className="fw-bold mb-3">
-              € {Number(product.price).toFixed(2)}
+          <div className="ot-list-item-details">
+            <p className="ot-list-item-price">
+              {product.discount_price ? (
+                <>
+                  <span style={{ textDecoration: 'line-through', color: 'black' }}>
+                    € {product.price?.toFixed(2)}
+                  </span>
+                  <span style={{ color: 'red', marginLeft: '8px' }}>
+                    € {product.discount_price.toFixed(2)}
+                  </span>
+                </>
+              ) : (
+                <>€ {product.price?.toFixed(2)}</>
+              )}
             </p>
-          )}
+          </div>
 
           {/* AZIONI */}
           <div className="mt-auto d-flex gap-2 flex-wrap align-items-center">
