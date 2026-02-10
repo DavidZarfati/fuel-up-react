@@ -11,6 +11,7 @@ export default function ProductsPage() {
   const { backendUrl } = useGlobal();
   const { isFavourite, toggleFavourite } = useFavourites();
 
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const urlState = useMemo(() => {

@@ -121,7 +121,7 @@ export default function SingleProductCard({ product, onToggleFavourite, onToggle
 
             <button
               //onClick={() => addToCart(product)}
-              onClick={() => onToggleCart(product)}
+              onClick={() => onToggleCart}
               className="btn btn-primary btn-sm"
             >
               Aggiungi
