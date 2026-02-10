@@ -135,11 +135,22 @@ export default function SingleProductList({ product }) {
                   </p>
                 )}
 
-                {product.price != null && (
-                  <p className="fw-bold mb-0">
-                    € {Number(product.price).toFixed(2)}
+                <div className="ot-list-item-details">
+                  <p className="ot-list-item-price">
+                    {product.discount_price ? (
+                      <>
+                        <span style={{ textDecoration: 'line-through', color: 'black' }}>
+                          € {product.price?.toFixed(2)}
+                        </span>
+                        <span style={{ color: 'red', marginLeft: '8px' }}>
+                          € {product.discount_price.toFixed(2)}
+                        </span>
+                      </>
+                    ) : (
+                      <>€ {product.price?.toFixed(2)}</>
+                    )}
                   </p>
-                )}
+                </div>
               </div>
 
               <div className="d-flex gap-2 flex-wrap align-items-center">
