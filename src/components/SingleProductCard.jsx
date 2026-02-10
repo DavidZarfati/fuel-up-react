@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useFavourites } from "../context/FavouritesContext";
 
-export default function SingleProductCard({ product, onToggleFavourite }) {
+export default function SingleProductCard({ product, onToggleFavourite, onAddToCart }) {
 
   const backendBaseUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -109,7 +109,10 @@ export default function SingleProductCard({ product, onToggleFavourite }) {
           {!isInCart ? (
 
             <button
-              onClick={() => addToCart(product)}
+              onClick={() => {
+                console.log("Grid: onAddToCart for", product.name);
+                if (onAddToCart) onAddToCart(); // calls parent
+              }}
               className="btn btn-primary btn-sm"
             >
               Aggiungi

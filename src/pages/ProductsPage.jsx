@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import { useFavourites } from "../context/FavouritesContext";
+import { useCart } from "../context/CartContext";
+import { Link } from "react-router-dom";
 import SingleProductCard from "../components/SingleProductCard";
 import SingleProductList from "../components/SingleProductList";
 import "./ProductsPage.css";
@@ -12,6 +14,23 @@ export default function ProductsPage() {
   const { isFavourite, toggleFavourite } = useFavourites();
 
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const [cartToast, setCartToast] = useState(null);
+  const [showCartToast, setShowCartToast] = useState(false);
+
+  const { addToCart } = useCart();
+
+  function handleAddToCart(p) {
+    addToCart(p);
+    setCartToast({ name: p.name, image: `${backendUrl}${p.image}` });
+    setShowCartToast(true);
+  }
+
+  useEffect(() => {
+    if (!cartToast || !showCartToast) return;
+    const timer = setTimeout(() => setShowCartToast(false), 3000);
+    return () => clearTimeout(timer);
+  }, [cartToast, showCartToast]);
 
   const urlState = useMemo(() => {
     const pageFromUrl = parseInt(searchParams.get("page") || "1", 10);
@@ -212,7 +231,7 @@ export default function ProductsPage() {
             <div className="ot-products-grid">
               {products.map((p, index) => (
                 <div className="ot-product-card-wrapper" key={p.id ?? p._id ?? index}>
-                  <SingleProductCard product={p} onToggleFavourite={handleToggleFavourite} />
+                  <SingleProductCard product={p} onToggleFavourite={handleToggleFavourite} onAddToCart={() => handleAddToCart(p)} />
                 </div>
               ))}
             </div>
@@ -234,7 +253,7 @@ export default function ProductsPage() {
                     />
                   </button>
 
-                  <SingleProductList product={p} />
+                  <SingleProductList product={p} onAddToCart={() => handleAddToCart(p)} />
                 </div>
               ))}
             </div>
@@ -244,15 +263,15 @@ export default function ProductsPage() {
           {favToast && showFavToast && (
             <div className="toast-container position-fixed" style={{ bottom: 30, right: 30, zIndex: 9999 }}>
               <div className="toast show" role="alert" aria-live="assertive" aria-atomic="true"
-                   style={{ minWidth: 320, background: "#fff", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
+                style={{ minWidth: 320, background: "#fff", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
                 <div className="toast-header" style={{ background: "#f5f5f5", borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
                   <img src={favToast.image} className="rounded me-2" alt={favToast.name}
-                       style={{ width: 32, height: 32, objectFit: "cover", marginRight: 8 }} />
+                    style={{ width: 32, height: 32, objectFit: "cover", marginRight: 8 }} />
                   <strong className="me-auto">Preferiti</strong>
                   <small className="text-body-secondary">{favToast.time}</small>
                   <button type="button" className="btn-close" aria-label="Close"
-                          onClick={() => setShowFavToast(false)}
-                          style={{ marginLeft: 8, border: "none", background: "transparent", fontSize: 18 }}>
+                    onClick={() => setShowFavToast(false)}
+                    style={{ marginLeft: 8, border: "none", background: "transparent", fontSize: 18 }}>
                     ×
                   </button>
                 </div>
@@ -268,6 +287,69 @@ export default function ProductsPage() {
                     >
                       Vedi nella pagina dei preferiti
                     </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TOAST AGGIORNAMENTO CART */}
+          {cartToast && showCartToast && (
+            <div className="toast-container position-fixed" style={{ bottom: 30, right: 30, zIndex: 9999 }}>
+              <div
+                className="toast show"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+                style={{
+                  minWidth: 320,
+                  background: "#fff",
+                  borderRadius: 8,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                }}
+              >
+                {/* Header (matches Bootstrap toast header pattern) */}
+                <div
+                  className="toast-header"
+                  style={{
+                    background: "#f5f5f5",
+                    borderTopLeftRadius: 8,
+                    borderTopRightRadius: 8,
+                  }}
+                >
+                  {/* Optionally show an image here too */}
+                  <img
+                    src={cartToast.image}
+                    className="rounded me-2"
+                    alt={cartToast.name}
+                    style={{ width: 32, height: 32, objectFit: "cover", marginRight: 8 }}
+                  />
+
+                  <strong className="me-auto">Carrello</strong>
+                  {/* You could use a time/label here if you want */}
+                  <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Close"
+                    onClick={() => setShowCartToast(false)}
+                    style={{ marginLeft: 8, border: "none", background: "transparent", fontSize: 18 }}
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {/* Body (similar to favorites toast) */}
+                <div className="toast-body" style={{ padding: "12px 24px", fontSize: 18 }}>
+                  Hai aggiunto <b>{cartToast.name}</b> al carrello
+                  <div style={{ marginTop: 12 }}>
+                    <Link
+                      to="/shopping-cart"
+                      className="btn btn-danger btn-sm"
+                      style={{ fontWeight: "bold", fontSize: 16 }}
+                      onClick={() => setShowCartToast(false)}
+                    >
+                      Vai al carrello
+                    </Link>
                   </div>
                 </div>
               </div>
