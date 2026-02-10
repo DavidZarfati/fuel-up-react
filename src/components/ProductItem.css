@@ -40,6 +40,7 @@
 .product-image-wrap {
   overflow: hidden;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  
 }
 
 .product-image {
@@ -48,6 +49,7 @@
   object-fit: contain;
   background: linear-gradient(145deg, #0f172a, #111826);
   transition: transform 0.22s ease;
+  border-radius: 10px;
 }
 
 .product-card:hover .product-image {
