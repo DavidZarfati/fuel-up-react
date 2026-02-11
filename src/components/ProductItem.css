@@ -115,6 +115,9 @@
 
 .product-add-btn {
   width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .product-cart-controls {
@@ -192,6 +195,13 @@
   gap: 8px;
 }
 
+.product-row-actions .btn-ui {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 @media (max-width: 900px) {
   .product-row {
     grid-template-columns: minmax(80px,110px) 1fr;
@@ -205,6 +215,10 @@
   .product-row-actions {
     grid-column: 1 / -1;
     justify-content: flex-start;
+  }
+
+  .product-row-actions .btn-ui {
+    max-width: 100%;
   }
 }
 
@@ -235,6 +249,15 @@
     top: auto;
     right: auto;
     margin: 8px 0 0 auto;
+  }
+
+  .product-row-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-row-actions .btn-ui {
+    width: 100%;
   }
 }
 
