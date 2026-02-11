@@ -24,14 +24,18 @@ function hasDiscount(product) {
 }
 
 function getProductCategory(product) {
-  return Number(
+  const raw =
     product?.macro_categories_id ??
     product?.category_id ??
     product?.category ??
     product?.categories_id ??
     product?.macro_category_id ??
-    product?.macro_category
-  );
+    product?.macro_category ??
+    product?.macro_category?.id ??
+    product?.category?.id;
+
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
 }
 
 export default function ProductsPage() {
@@ -46,61 +50,72 @@ export default function ProductsPage() {
     const q = searchParams.get("q") || "";
     const orderBy = searchParams.get("order_by") || "created_at";
     const orderDir = (searchParams.get("order_dir") || "desc").toLowerCase() === "asc" ? "asc" : "desc";
-    const category = searchParams.get("category") || "";
+    const categoryParam = searchParams.get("category") || "";
     const onSaleOnly = searchParams.get("on_sale") === "1";
-    return { safePage, safeView, q, orderBy, orderDir, category, onSaleOnly };
+    return { safePage, safeView, q, orderBy, orderDir, categoryParam, onSaleOnly };
   }, [searchParams]);
 
-  const limit = 12;
+  // Paginazione client-side (corretta con filtri client-side)
+  const pageSize = 12;
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(urlState.safePage);
-  const [totalPages, setTotalPages] = useState(1);
   const [view, setView] = useState(urlState.safeView);
   const [q, setQ] = useState(urlState.q);
   const [orderBy, setOrderBy] = useState(urlState.orderBy);
   const [orderDir, setOrderDir] = useState(urlState.orderDir);
-  const [category, setCategory] = useState(urlState.category ? Number(urlState.category) : "");
+  const [category, setCategory] = useState(urlState.categoryParam ? Number(urlState.categoryParam) : "");
   const [onSaleOnly, setOnSaleOnly] = useState(urlState.onSaleOnly);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  // Sync state con URL
   useEffect(() => {
     if (page !== urlState.safePage) setPage(urlState.safePage);
     if (view !== urlState.safeView) setView(urlState.safeView);
     if (q !== urlState.q) setQ(urlState.q);
     if (orderBy !== urlState.orderBy) setOrderBy(urlState.orderBy);
     if (orderDir !== urlState.orderDir) setOrderDir(urlState.orderDir);
-    const nextCategory = urlState.category ? Number(urlState.category) : "";
+
+    const nextCategory = urlState.categoryParam ? Number(urlState.categoryParam) : "";
     if (category !== nextCategory) setCategory(nextCategory);
+
     if (onSaleOnly !== urlState.onSaleOnly) setOnSaleOnly(urlState.onSaleOnly);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlState]);
 
+  // Reset pagina quando cambia QUALUNQUE filtro/visualizzazione
   useEffect(() => {
-    // reset pagination when changing category to avoid empty pages
     setPage(1);
-  }, [category]);
+  }, [category, q, onSaleOnly, orderBy, orderDir, view]);
 
+  // Aggiorna URL params (senza "limit" che sporca la URL)
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
 
     if (page > 1) params.set("page", String(page));
     else params.delete("page");
+
     params.set("view", view);
+
     if (q) params.set("q", q);
     else params.delete("q");
+
     params.set("order_by", orderBy);
     params.set("order_dir", orderDir);
-    const limitValue = category === "" ? limit : 100; // fetch more items when filtering by category
-    params.set("limit", String(limitValue));
+
     if (category !== "") params.set("category", String(category));
     else params.delete("category");
+
     if (onSaleOnly) params.set("on_sale", "1");
     else params.delete("on_sale");
 
     setSearchParams(params, { replace: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, view, q, orderBy, orderDir, category, onSaleOnly]);
 
+  // Fetch prodotti: quando filtri client-side, prendi un set grande dalla page 1
   useEffect(() => {
     let ignore = false;
 
@@ -109,30 +124,22 @@ export default function ProductsPage() {
       setError("");
 
       try {
+        const shouldClientFilter = category !== "" || onSaleOnly || q;
+
         const params = new URLSearchParams();
-        params.set("page", String(page));
-        const limitValue = category === "" ? limit : 100; // ensure all category items are in the page payload
-        params.set("limit", String(limitValue));
+        params.set("page", String(shouldClientFilter ? 1 : page));
+        params.set("limit", String(shouldClientFilter ? 500 : pageSize)); // puoi alzare se hai molti prodotti
         if (q) params.set("q", q);
         if (orderBy) params.set("order_by", orderBy);
         if (orderDir) params.set("order_dir", orderDir);
-        // NON filtriamo per categoria lato backend (schema non omogeneo); filtriamo lato client
         if (onSaleOnly) params.set("on_sale", "1");
 
         const resp = await axios.get(`${backendUrl}/api/products?${params.toString()}`);
         const data = resp.data;
         const list = Array.isArray(data?.result) ? data.result : [];
-        let pages = 1;
-        if (data?.info) {
-          if (typeof data.info.totale_pagine === "number") pages = data.info.totale_pagine;
-          else if (typeof data.info.pages === "number") pages = data.info.pages;
-        } else if (typeof data?.totale_pagine === "number") {
-          pages = data.totale_pagine;
-        }
 
         if (!ignore) {
           setProducts(list);
-          setTotalPages(pages);
         }
       } catch {
         if (!ignore) setError("Errore nel caricamento dei prodotti.");
@@ -147,12 +154,8 @@ export default function ProductsPage() {
     };
   }, [backendUrl, page, q, orderBy, orderDir, category, onSaleOnly]);
 
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [totalPages, page]);
-
+  // Filtra + ordina lato client (come avevi, ma più robusto)
   const visibleProducts = useMemo(() => {
-    // Filtro
     let filtered = products.filter((product) => {
       const productCategory = getProductCategory(product);
       const matchesCategory = category === "" || productCategory === Number(category);
@@ -160,47 +163,52 @@ export default function ProductsPage() {
       return matchesCategory && matchesSale;
     });
 
-    // Ordinamento client-side
     if (orderBy) {
       filtered = [...filtered].sort((a, b) => {
         let aValue, bValue;
+
         if (orderBy === "price") {
-          // Se c'è discount_price valido, usa quello, altrimenti price
-          aValue = (a.discount_price && Number(a.discount_price) > 0) ? Number(a.discount_price) : Number(a.price);
-          bValue = (b.discount_price && Number(b.discount_price) > 0) ? Number(b.discount_price) : Number(b.price);
+          aValue = a.discount_price && Number(a.discount_price) > 0 ? Number(a.discount_price) : Number(a.price);
+          bValue = b.discount_price && Number(b.discount_price) > 0 ? Number(b.discount_price) : Number(b.price);
         } else {
           aValue = a[orderBy];
           bValue = b[orderBy];
-          if (orderBy === "discount_price") {
-            aValue = Number(aValue);
-            bValue = Number(bValue);
-          } else if (typeof aValue === "string" && typeof bValue === "string") {
+
+          if (typeof aValue === "string" && typeof bValue === "string") {
             aValue = aValue.toLowerCase();
             bValue = bValue.toLowerCase();
+          } else {
+            aValue = Number.isFinite(Number(aValue)) ? Number(aValue) : aValue;
+            bValue = Number.isFinite(Number(bValue)) ? Number(bValue) : bValue;
           }
         }
+
         if (aValue < bValue) return orderDir === "asc" ? -1 : 1;
         if (aValue > bValue) return orderDir === "asc" ? 1 : -1;
         return 0;
       });
     }
+
     return filtered;
   }, [products, category, onSaleOnly, orderBy, orderDir]);
+
+  // Paginazione lato client (COERENTE con i filtri)
+  const clientTotalPages = useMemo(() => {
+    return Math.max(1, Math.ceil(visibleProducts.length / pageSize));
+  }, [visibleProducts.length]);
+
+  const pagedProducts = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return visibleProducts.slice(start, start + pageSize);
+  }, [visibleProducts, page]);
+
+  useEffect(() => {
+    if (page > clientTotalPages) setPage(clientTotalPages);
+  }, [clientTotalPages, page]);
 
   return (
     <section className="page-section">
       <div className="app-container">
-        {/* <div className="products-page-header surface-card">
-          <div>
-            <h1 className="title-lg">Catalogo FuelUp PRO</h1>
-            <p className="text-muted">Prodotti premium in stile fitness performance dark.</p>
-          </div>
-          <button type="button" className="btn-ui btn-ui-outline products-filter-toggle" onClick={() => setFiltersOpen((value) => !value)}>
-            <i className="bi bi-sliders"></i>
-            Filtri
-          </button>
-        </div> */}
-
         <div className="products-page-layout">
           <aside className={`surface-card products-filters-panel ${filtersOpen ? "open" : ""}`}>
             <div className="toolbar-group">
@@ -211,20 +219,32 @@ export default function ProductsPage() {
             <div className="toolbar-group">
               <span className="toolbar-label">Offerte</span>
               <label className="products-sale-switch">
-                <input type="checkbox" checked={onSaleOnly} onChange={(event) => setOnSaleOnly(event.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={onSaleOnly}
+                  onChange={(event) => setOnSaleOnly(event.target.checked)}
+                />
                 <span>Mostra solo scontati</span>
               </label>
             </div>
 
             <div className="toolbar-group">
               <span className="toolbar-label">Ordinamento</span>
-              <select className="select-ui" value={orderBy} onChange={(event) => { setOrderBy(event.target.value); setPage(1); }}>
+              <select
+                className="select-ui"
+                value={orderBy}
+                onChange={(event) => setOrderBy(event.target.value)}
+              >
                 <option value="created_at">Nuovi arrivi / Novità</option>
                 <option value="name">Nome</option>
                 <option value="price">Prezzo</option>
                 <option value="brand">Brand</option>
               </select>
-              <select className="select-ui" value={orderDir} onChange={(event) => { setOrderDir(event.target.value); setPage(1); }}>
+              <select
+                className="select-ui"
+                value={orderDir}
+                onChange={(event) => setOrderDir(event.target.value)}
+              >
                 <option value="desc">Decrescente</option>
                 <option value="asc">Crescente</option>
               </select>
@@ -235,7 +255,7 @@ export default function ProductsPage() {
             <div className="surface-card toolbar products-main-toolbar">
               <div className="toolbar-group">
                 <span className="toolbar-label">Visualizza</span>
-                <ViewToggle value={view} onChange={(nextView) => { setView(nextView); setPage(1); }} />
+                <ViewToggle value={view} onChange={(nextView) => setView(nextView)} />
               </div>
               <div className="products-count text-muted">{visibleProducts.length} prodotti visualizzati</div>
             </div>
@@ -262,19 +282,19 @@ export default function ProductsPage() {
               <>
                 {view === "grid" ? (
                   <div className="products-grid">
-                    {visibleProducts.map((product) => (
+                    {pagedProducts.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
                   </div>
                 ) : (
                   <div className="products-list">
-                    {visibleProducts.map((product) => (
+                    {pagedProducts.map((product) => (
                       <ProductRow key={product.id} product={product} />
                     ))}
                   </div>
                 )}
 
-                {totalPages > 1 && (
+                {clientTotalPages > 1 && (
                   <div className="surface-card pagination">
                     <button
                       type="button"
@@ -285,13 +305,13 @@ export default function ProductsPage() {
                       Indietro
                     </button>
                     <span>
-                      Pagina <strong>{page}</strong> di <strong>{totalPages}</strong>
+                      Pagina <strong>{page}</strong> di <strong>{clientTotalPages}</strong>
                     </span>
                     <button
                       type="button"
                       className="btn-ui btn-ui-outline"
-                      onClick={() => setPage((current) => Math.min(current + 1, totalPages))}
-                      disabled={page === totalPages}
+                      onClick={() => setPage((current) => Math.min(current + 1, clientTotalPages))}
+                      disabled={page === clientTotalPages}
                     >
                       Avanti
                     </button>
