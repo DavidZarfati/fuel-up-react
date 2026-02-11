@@ -10,7 +10,7 @@ import ShippingBanner from "./ShippingBanner";
 
 const MAIN_LINKS = [
   { title: "Chi siamo", path: "/about-us" },
-  { title: "I nostri prodotti", path: "/products" },
+  { title: "Nostri prodotti", path: "/products" },
   { title: "Preferiti", path: "/products/favourites" },
   { title: "Carrello", path: "/shopping-cart", icon: "bi bi-cart3" },
 ];
@@ -97,7 +97,7 @@ export default function Header({ nameApp }) {
           <div className="ot-header-actions">
             <button
               type="button"
-              className="ot-header-menu-toggle"
+              className="ot-header-menu-toggle "
               onClick={() => setIsMenuOpen((value) => !value)}
               aria-label="Apri menu"
             >
