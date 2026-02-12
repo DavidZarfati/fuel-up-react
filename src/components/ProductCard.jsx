@@ -144,7 +144,7 @@ export default function ProductCard({ product }) {
                 </button>
               </div>
               <button type="button" className="btn-ui btn-ui-outline neon-btn" onClick={() => navigate("/shopping-cart")}>
-                Vai al carrello
+                Carrello<i className="bi bi-cart3"></i>
               </button>
             </div>
           )}

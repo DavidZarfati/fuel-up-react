@@ -140,7 +140,7 @@ export default function ProductRow({ product }) {
                 </button>
               </div>
               <button type="button" className="btn-ui btn-ui-outline neon-btn" onClick={() => navigate("/shopping-cart")}>
-                Carrello
+                Carrello<i className="bi bi-cart3"></i>
               </button>
             </>
           )}
