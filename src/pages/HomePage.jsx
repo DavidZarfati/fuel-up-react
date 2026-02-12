@@ -159,8 +159,8 @@ export default function HomePage() {
           <>
             <section className="home-product-section">
               <div className="home-section-head">
-                <h2 className="title-lg">Best Sellers</h2>
-                <p className="text-muted">Selezione top per performance e recupero.</p>
+                <h2 className="title-lg">Le nostre proposte</h2>
+                <p className="text-muted">Selezione d'eccellenza per prestazione e ripresa muscolare</p>
               </div>
 
               {view === "grid" ? (
