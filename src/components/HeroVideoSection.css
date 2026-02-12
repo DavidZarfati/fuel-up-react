@@ -4,6 +4,7 @@
   overflow: hidden;
   padding: 0;
   border-radius: var(--radius-lg);
+  margin-bottom: 25px;
 }
 
 .hero-video-copy {
@@ -21,7 +22,8 @@
   line-height: 0.95;
   font-weight: 800;
   letter-spacing: 0.01em;
-  color: #f8fbff;
+  color: #20f7f7;
+  
 }
 
 .hero-video-tagline {
@@ -29,7 +31,7 @@
   font-size: clamp(14px, 1.8vw, 26px);
   line-height: 1.2;
   font-weight: 600;
-  color: #c3d3e7;
+  color: #4290de;
 }
 
 .hero-video-media {
